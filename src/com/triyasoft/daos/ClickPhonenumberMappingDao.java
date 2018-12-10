@@ -17,205 +17,156 @@ public class ClickPhonenumberMappingDao {
 
 	public static void createClickRequest(String clickID, String phonenumeber) {
 
+		PreparedStatement stmt = null;
+		Connection conn = ProjectUtils.getMySQLConnection();
 
+		try {
 
-		
-		   
-		   PreparedStatement stmt = null;
- 	       Connection conn = ProjectUtils.getMySQLConnection();
+			stmt = conn
+					.prepareStatement("INSERT INTO clickphonenumbermapping ( clickid,phonenumber)  VALUES (?,?)");
+			int counter = 1;
 
-			     
-			        try
-		       		{
-			        	
-			        	
+			stmt.setString(counter++, clickID);
+			stmt.setString(counter++, phonenumeber);
 
-			           	
-			 	       
-		            stmt = conn.prepareStatement("INSERT INTO clickphonenumbermapping ( clickid,phonenumber)  VALUES (?,?)");
-		            int counter =1;
-		            
-		            stmt.setString(counter++, clickID);
-		            stmt.setString(counter++, phonenumeber);
-			         
-		            stmt.executeUpdate();
-		       		}
-			        
-		        catch(SQLException se)
-		         {
-		            //Handle errors for JDBC
-		            se.printStackTrace();
-		         }
+			stmt.executeUpdate();
+		}
 
-		         catch(Exception e){
-		            //Handle errors for Class.forName
-		            e.printStackTrace();
-		         }
-			        
-			        finally {
-			        	ProjectUtils.closeConnection(null, stmt, conn);
-			        }
-			        
-			       
-	
-	
+		catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
+
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		}
+
+		finally {
+			ProjectUtils.closeConnection(null, stmt, conn);
+		}
+
 	}
 
-	public static void releasePhoneNumber(String clickID,String phoneNumber) {
-		
-
+	public static void releasePhoneNumber(String clickID, String phoneNumber) {
 
 		PreparedStatement stmt = null;
-	    Connection conn = ProjectUtils.getMySQLConnection();
+		Connection conn = ProjectUtils.getMySQLConnection();
 
-		
-		 try
-    		{
-	        
-			 
-	
-	           	
-         stmt = conn.prepareStatement("UPDATE clickphonenumbermapping SET pagevisible = ? , click_end_time = ?   where clickid=? and phonenumber = ? ;");
-         
+		try {
 
-        
-         int counter =1;
-         
-         stmt.setInt(counter++, 0);
-         stmt.setTimestamp(counter++, new Timestamp(new Date().getTime()));
-         stmt.setString(counter++, clickID);
-         stmt.setString(counter++, phoneNumber);
+			stmt = conn
+					.prepareStatement("UPDATE clickphonenumbermapping SET pagevisible = ? , click_end_time = ?   where clickid=? and phonenumber = ? ;");
 
-        
+			int counter = 1;
 
-        stmt.executeUpdate();
+			stmt.setInt(counter++, 0);
+			stmt.setTimestamp(counter++, new Timestamp(new Date().getTime()));
+			stmt.setString(counter++, clickID);
+			stmt.setString(counter++, phoneNumber);
 
-    		}
-	        
-     catch(SQLException se)
-      {
-         //Handle errors for JDBC
-         se.printStackTrace();
-      }
+			stmt.executeUpdate();
 
-      catch(Exception e){
-         //Handle errors for Class.forName
-         e.printStackTrace();
-      }
-	        
-	       
-		 finally {
-			 ProjectUtils.closeConnection(null, stmt, conn);
-		 }
-		
+		}
 
+		catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
 
-	
-		
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		}
+
+		finally {
+			ProjectUtils.closeConnection(null, stmt, conn);
+		}
+
 	}
 
-	public static List<String>  loadAllInUserNumbers() {
-		
-	
+	public static List<String> loadAllInUserNumbers() {
+
 		Statement stmt = null;
-		ResultSet rs =  null;
-	    Connection conn = ProjectUtils.getMySQLConnection();
+		ResultSet rs = null;
+		Connection conn = ProjectUtils.getMySQLConnection();
 
-	    List<String> phoneNumbersList = new ArrayList<String>();
+		List<String> phoneNumbersList = new ArrayList<String>();
 
-		  try
-    		{
-		
-		       stmt = conn.createStatement();
-				
-				 rs = stmt.executeQuery("select distinct phonenumber from clickphonenumbermapping where pagevisible = '1' ;");
-				
-				while(rs.next()) {
-					
-					phoneNumbersList.add(rs.getString("phonenumber"));
-					
-			
-				}
-    		}
-	        
-	        catch(SQLException se)
-	         {
-	            //Handle errors for JDBC
-	            se.printStackTrace();
-	         }
+		try {
 
-	         catch(Exception e){
-	            //Handle errors for Class.forName
-	            e.printStackTrace();
-	         }
-		        
-		        finally{
+			stmt = conn.createStatement();
 
-		        	ProjectUtils.closeConnection(rs,stmt,conn);
+			rs = stmt
+					.executeQuery("select distinct phonenumber from clickphonenumbermapping where pagevisible = '1' ;");
 
-					}
-					
-					
-					
-				
-		        	
-		        
+			while (rs.next()) {
+
+				phoneNumbersList.add(rs.getString("phonenumber"));
+
+			}
+		}
+
+		catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
+
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		}
+
+		finally {
+
+			ProjectUtils.closeConnection(rs, stmt, conn);
+
+		}
+
 		return phoneNumbersList;
-	
-	
+
 	}
 
 	public static String checkIfPhoneNumberExistForClick(String clickID) {
-		
 
-		
-		
 		Statement stmt = null;
-		ResultSet rs =  null;
-	    Connection conn = ProjectUtils.getMySQLConnection();
-	    String number = null;
-	    
-		  try
-    		{
-		
-		       stmt = conn.createStatement();
-				
-				 rs = stmt.executeQuery("select distinct phonenumber from clickphonenumbermapping where clickid = '"+clickID+"' and pagevisible=1 ;");
-				
-				if(rs.next()) {
-					
-					
-					number = rs.getString("phonenumber");
-			
-				}
-    		}
-	        
-	        catch(SQLException se)
-	         {
-	            //Handle errors for JDBC
-	            se.printStackTrace();
-	         }
+		ResultSet rs = null;
+		Connection conn = ProjectUtils.getMySQLConnection();
+		String number = null;
 
-	         catch(Exception e){
-	            //Handle errors for Class.forName
-	            e.printStackTrace();
-	         }
-		        
-		        finally{
+		try {
 
-		        	ProjectUtils.closeConnection(rs,stmt,conn);
+			stmt = conn.createStatement();
 
-					}
-					
-					
-					
-				
-		        	
-		        
+			rs = stmt
+					.executeQuery("select distinct phonenumber from clickphonenumbermapping where clickid = '"
+							+ clickID + "' and pagevisible=1 ;");
+
+			if (rs.next()) {
+
+				number = rs.getString("phonenumber");
+
+			}
+		}
+
+		catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
+
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		}
+
+		finally {
+
+			ProjectUtils.closeConnection(rs, stmt, conn);
+
+		}
+
 		return number;
-	
-	
-	
+
 	}
 
 }

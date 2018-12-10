@@ -29,7 +29,6 @@ import com.triyasoft.daos.BuyerDaoService;
 import com.triyasoft.daos.CallsDaoService;
 import com.triyasoft.daos.ContactDao;
 import com.triyasoft.daos.PhoneNumberDaoService;
-import com.triyasoft.model.AppSetting;
 import com.triyasoft.model.Buyer;
 import com.triyasoft.model.BuyerSourcePreferenceFilter;
 import com.triyasoft.model.CallModel;
@@ -41,8 +40,6 @@ import com.triyasoft.model.TrafficSource;
 import com.triyasoft.ui.DashboardUIGenerator;
 
 public class CallRoutingServiceV2 {
-
-
 
 	public static Map<Integer, Buyer> cachedbuyersMap = null;
 	public static Map<String, Buyer> cachedbuyersMapByPhoneNumber = null;
@@ -62,10 +59,6 @@ public class CallRoutingServiceV2 {
 	public static boolean isdataLoaded = false;
 
 	public static int loopcount = 0;
-	
-	
-	
-
 
 	public static void main(String[] args) {
 
@@ -77,7 +70,8 @@ public class CallRoutingServiceV2 {
 
 	}
 
-	public static CallModel allocateNumberToRoute(CallModel callModel, List<Buyer> prohibitedBuyers) {
+	public static CallModel allocateNumberToRoute(CallModel callModel,
+			List<Buyer> prohibitedBuyers) {
 
 		// in real scenarios it wont be called. added for standalsone testing
 
@@ -116,24 +110,27 @@ public class CallRoutingServiceV2 {
 
 	}
 
-	private static Buyer allocateCalltoABuyerV2(CallModel callModel, List<Buyer> prohibitedBuyers) {
-		
+	private static Buyer allocateCalltoABuyerV2(CallModel callModel,
+			List<Buyer> prohibitedBuyers) {
+
 		StringBuffer auditRotingLogic = callModel.getRoutingLogic();
 
-		
 		// Getting List of eligibleBuyer
 
 		List<Buyer> eligibleBuyer = new ArrayList<Buyer>(cachedBuyersList);
 		for (Buyer buyer : eligibleBuyer) {
-			auditRotingLogic.append( "<span style=\"color:green;font-weight: 600;\">" +buyer.getBuyer_name()+": "+ buyer.getBuyer_number()+" is Eligibile  </span> <br/>");
+			auditRotingLogic
+					.append("<span style=\"color:green;font-weight: 600;\">"
+							+ buyer.getBuyer_name() + ": "
+							+ buyer.getBuyer_number()
+							+ " is Eligibile  </span> <br/>");
 
 		}
-		
+
 		// Check if Caller is in blocked List
-		
 
 		callModel.setRoutingLogic(auditRotingLogic);
-		
+
 		List<ContactModel> blockedContacts = ContactDao.getBlockedContacts();
 
 		for (ContactModel blockedContact : blockedContacts) {
@@ -145,53 +142,61 @@ public class CallRoutingServiceV2 {
 				callModel.setError_code("E009");
 				callModel.setError_description(callModel.getCaller_number()
 						+ "  " + callModel.getCallerName() + " is blocked");
-				auditRotingLogic.append(" <span style=\"color:red\">"+callModel.getCaller_number()+ "  " + callModel.getCallerName() + " is blocked </span> <br/>");
-				auditRotingLogic.append(" <span style=\"color:red\"> Rejecting the call </span>");
+				auditRotingLogic.append(" <span style=\"color:red\">"
+						+ callModel.getCaller_number() + "  "
+						+ callModel.getCallerName()
+						+ " is blocked </span> <br/>");
+				auditRotingLogic
+						.append(" <span style=\"color:red\"> Rejecting the call </span>");
 				return null;
 			}
 
 		}
 
-		if(!AppSettingsDao.isSkypeAllowed()) {
-		
-			String[] blockedSeries= {"1661380","1559515","1339207","17194931","1888","1877","1855","1866","1844","1800","1881","17029131"};
+		if (!AppSettingsDao.isSkypeAllowed()) {
+
+			String[] blockedSeries = { "1661380", "1559515", "1339207",
+					"17194931", "1888", "1877", "1855", "1866", "1844", "1800",
+					"1881", "17029131" };
 			String callerNumber = callModel.getCaller_number();
-			boolean isBlockedPattern =  false; // checkBlockedPattern(blockedSeries,callerNumber);
-			
+			boolean isBlockedPattern = false; // checkBlockedPattern(blockedSeries,callerNumber);
+
 			for (String pattern : blockedSeries) {
-				if(callerNumber.startsWith(pattern)){
-					isBlockedPattern =  true;
+				if (callerNumber.startsWith(pattern)) {
+					isBlockedPattern = true;
 					break;
 				}
 			}
-			
-			
-		if (isBlockedPattern) {
 
-			callModel.setError_code("E009");
-			callModel
-					.setError_description(callModel.getCaller_number()
-							+ "  "
-							+ callModel.getCallerName()
-							+ " is blocked"
-							+ " due to  blocked pattern ");
-			auditRotingLogic.append(" <span style=\"color:red\"> "+callModel.getCaller_number()+ "  " + callModel.getCallerName() + " is blocked due to prefix pattern blocking</span> <br/>");
+			if (isBlockedPattern) {
 
-			return null;
+				callModel.setError_code("E009");
+				callModel.setError_description(callModel.getCaller_number()
+						+ "  " + callModel.getCallerName() + " is blocked"
+						+ " due to  blocked pattern ");
+				auditRotingLogic
+						.append(" <span style=\"color:red\"> "
+								+ callModel.getCaller_number()
+								+ "  "
+								+ callModel.getCallerName()
+								+ " is blocked due to prefix pattern blocking</span> <br/>");
+
+				return null;
+			}
 		}
-	}
 
 		List<Buyer> excludedBuyers = new ArrayList<Buyer>();
 		List<Buyer> rejectedBuyers = new ArrayList<Buyer>();
 
-		auditRotingLogic.append(" <span style=\"color:blue\"> Buyer Map Size +"+cachedbuyersMap.size()+"</span><br/>");
+		auditRotingLogic.append(" <span style=\"color:blue\"> Buyer Map Size +"
+				+ cachedbuyersMap.size() + "</span><br/>");
 
-		
 		if (cachedbuyersMap.size() == 0) {
 			callModel.setError_code("E005");
 			callModel
 					.setError_description("No Buyer is currently Active to take call");
-			auditRotingLogic.append(" <span style=\"color:red\"> No Buyer is currently Active to take call </span><br/>");
+			auditRotingLogic
+					.append(" <span style=\"color:red\"> No Buyer is currently Active to take call </span><br/>");
 			return null;
 		}
 
@@ -203,8 +208,12 @@ public class CallRoutingServiceV2 {
 		if (buyerIds != null && buyerIds.size() > 0) {
 			for (Integer buyerid : buyerIds) {
 				Buyer buyer = cachedbuyersMap.get(buyerid);
-				if (buyer != null){
-					auditRotingLogic.append(" <span style=\"color:red\"> buyer Temporariliry blocked Due to Dups Check:"+ buyer.getBuyer_name()+": "+ buyer.getBuyer_number()+" </span><br/>");
+				if (buyer != null) {
+					auditRotingLogic
+							.append(" <span style=\"color:red\"> buyer Temporariliry blocked Due to Dups Check:"
+									+ buyer.getBuyer_name()
+									+ ": "
+									+ buyer.getBuyer_number() + " </span><br/>");
 					excludedBuyers.add(buyer);
 				}
 
@@ -228,8 +237,13 @@ public class CallRoutingServiceV2 {
 
 				if (!evaluateBuyer) {
 					rejectedBuyers.add(buyer);
-					auditRotingLogic.append(" <span style=\"color:red\"> Buyer blocked Due to Filter Restriction:"+ buyer.getBuyer_name()+": "+ buyer.getBuyer_number()+" </span> <br/>");
-		
+					auditRotingLogic
+							.append(" <span style=\"color:red\"> Buyer blocked Due to Filter Restriction:"
+									+ buyer.getBuyer_name()
+									+ ": "
+									+ buyer.getBuyer_number()
+									+ " </span> <br/>");
+
 				}
 
 			}
@@ -242,9 +256,18 @@ public class CallRoutingServiceV2 {
 			int currentlyRunningCallsWithBuyer = checkNumberofCallsforBuyer(buyer);
 			if ((currentlyRunningCallsWithBuyer >= buyer
 					.getConcurrency_cap_limit())
-					&& (buyer.getConcurrency_cap_limit() != -1)){
+					&& (buyer.getConcurrency_cap_limit() != -1)) {
 				rejectedBuyers.add(buyer);
-				auditRotingLogic.append(" <span style=\"color:red\">Buyer blocked Due to Concurrency Cap Reached:"+ buyer.getBuyer_name()+": "+ buyer.getBuyer_number()+" Buyer's Currrent Concurrency:"+buyer.getConcurrency_cap_limit()+" Buyer's Max Concurrency :"+ currentlyRunningCallsWithBuyer+" </span> <br/>");
+				auditRotingLogic
+						.append(" <span style=\"color:red\">Buyer blocked Due to Concurrency Cap Reached:"
+								+ buyer.getBuyer_name()
+								+ ": "
+								+ buyer.getBuyer_number()
+								+ " Buyer's Currrent Concurrency:"
+								+ buyer.getConcurrency_cap_limit()
+								+ " Buyer's Max Concurrency :"
+								+ currentlyRunningCallsWithBuyer
+								+ " </span> <br/>");
 
 			}
 
@@ -256,53 +279,81 @@ public class CallRoutingServiceV2 {
 
 		for (Buyer buyer : cachedBuyersList) {
 			int todayCallsWithBuyer = getTodayscallwithBuyer(buyer, todaysCall);
-			auditRotingLogic.append(" <span style=\"color:blue\"> Logging for daily caps:"+ buyer.getBuyer_name()+": "+ buyer.getBuyer_number()+" Buyer's Daily Cap:"+buyer.getBuyer_daily_cap()+" Number of Calls to Buyer Today :"+ todayCallsWithBuyer+" </span> <br/>");
-			
+			auditRotingLogic
+					.append(" <span style=\"color:blue\"> Logging for daily caps:"
+							+ buyer.getBuyer_name()
+							+ ": "
+							+ buyer.getBuyer_number()
+							+ " Buyer's Daily Cap:"
+							+ buyer.getBuyer_daily_cap()
+							+ " Number of Calls to Buyer Today :"
+							+ todayCallsWithBuyer + " </span> <br/>");
+
 			if ((todayCallsWithBuyer >= buyer.getBuyer_daily_cap())
 					&& (buyer.getBuyer_daily_cap() != -1)) {
 				rejectedBuyers.add(buyer);
-				auditRotingLogic.append(" <span style=\"color:red\"> Buyer blocked Due to Daily Cap Reached:"+ buyer.getBuyer_name()+": "+ buyer.getBuyer_number()+" Buyer's Daily Cap:"+buyer.getBuyer_daily_cap()+" Number of Calls to Buyer Today :"+ todayCallsWithBuyer+" </span> <br/>");
+				auditRotingLogic
+						.append(" <span style=\"color:red\"> Buyer blocked Due to Daily Cap Reached:"
+								+ buyer.getBuyer_name()
+								+ ": "
+								+ buyer.getBuyer_number()
+								+ " Buyer's Daily Cap:"
+								+ buyer.getBuyer_daily_cap()
+								+ " Number of Calls to Buyer Today :"
+								+ todayCallsWithBuyer + " </span> <br/>");
 
 			}
 		}
 
-	
-		
+		auditRotingLogic
+				.append("<br/><span style=\"color:red;font-weight: 800;\">Non Eligible Buyers Rejecting from Allocation </span> <br/>");
 
-				auditRotingLogic.append("<br/><span style=\"color:red;font-weight: 800;\">Non Eligible Buyers Rejecting from Allocation </span> <br/>");
-				
 		for (Buyer rejectedByer : rejectedBuyers) {
 			boolean present = eligibleBuyer.remove(rejectedByer);
-			if(present)
-				auditRotingLogic.append( "<span style=\"color:red\">  Rejecting Buyer: "+rejectedByer.getBuyer_name()+": "+ rejectedByer.getBuyer_number()+" </span><br/>");
+			if (present)
+				auditRotingLogic
+						.append("<span style=\"color:red\">  Rejecting Buyer: "
+								+ rejectedByer.getBuyer_name() + ": "
+								+ rejectedByer.getBuyer_number()
+								+ " </span><br/>");
 
 		}
 
 		for (Buyer excludedBuyer : excludedBuyers) {
-			boolean present = 	eligibleBuyer.remove(excludedBuyer);
-			if(present)
-				auditRotingLogic.append( " <span style=\"color:red\"> Excluding Buyer's: "+excludedBuyer.getBuyer_name()+": "+ excludedBuyer.getBuyer_number()+" </span><br/>");
+			boolean present = eligibleBuyer.remove(excludedBuyer);
+			if (present)
+				auditRotingLogic
+						.append(" <span style=\"color:red\"> Excluding Buyer's: "
+								+ excludedBuyer.getBuyer_name()
+								+ ": "
+								+ excludedBuyer.getBuyer_number()
+								+ " </span><br/>");
 
 		}
 
 		//
-		
-		if(prohibitedBuyers != null) {
-			
-		for (Buyer  prohibitedBuyer: prohibitedBuyers) {
-			boolean present  = eligibleBuyer.remove(prohibitedBuyer);
-			if(present)
-				auditRotingLogic.append( "<span style=\"color:red\"> Buyer : "+prohibitedBuyer.getBuyer_name()+": "+ prohibitedBuyer.getBuyer_number()+" already called but picked the call, so droping it from current call Allocation  </span> <br/>");
+
+		if (prohibitedBuyers != null) {
+
+			for (Buyer prohibitedBuyer : prohibitedBuyers) {
+				boolean present = eligibleBuyer.remove(prohibitedBuyer);
+				if (present)
+					auditRotingLogic
+							.append("<span style=\"color:red\"> Buyer : "
+									+ prohibitedBuyer.getBuyer_name()
+									+ ": "
+									+ prohibitedBuyer.getBuyer_number()
+									+ " already called but picked the call, so droping it from current call Allocation  </span> <br/>");
+
+			}
 
 		}
 
-		}
-		
-		auditRotingLogic.append("<span style=\"color:red;font-weight: 800;\">Non Eligible Buyers Rejecting from Allocation Completed</span> <br/>");
-		
-		auditRotingLogic.append("<br/>  <span style=\"color:green;font-weight: 600;\">Call Allocation Begins with Eligible Buyers in Lowest Tier(Highest priority tier)</span><br/>");
+		auditRotingLogic
+				.append("<span style=\"color:red;font-weight: 800;\">Non Eligible Buyers Rejecting from Allocation Completed</span> <br/>");
 
-
+		auditRotingLogic
+				.append("<br/>  <span style=\"color:green;font-weight: 600;\">Call Allocation Begins with Eligible Buyers in Lowest Tier(Highest priority tier)</span><br/>");
 
 		// public static List<HoldBuyer> holdBuyers = new
 		// ArrayList<HoldBuyer>();
@@ -351,7 +402,6 @@ public class CallRoutingServiceV2 {
 
 			double minimumBuyerCallWeightVsbuyerTierWeightRatio = Integer.MAX_VALUE;
 
-
 			for (Buyer eligibleBuyerInCurrentTier : eligibleBuyersInCurrentTier) {
 
 				double buyerCallWeight = 0;
@@ -375,11 +425,15 @@ public class CallRoutingServiceV2 {
 				if (minimumBuyerCallWeightVsbuyerTierWeightRatio > buyerCallWeightVsbuyerTierWeightRatio)
 					minimumBuyerCallWeightVsbuyerTierWeightRatio = buyerCallWeightVsbuyerTierWeightRatio;
 
-				auditRotingLogic.append(eligibleBuyerInCurrentTier
-						.getBuyer_name() +": " + eligibleBuyerInCurrentTier.getBuyer_number()
-						+ ":"
-						+ " Normalized Buyer Weight Vs Total Tier Weight Ratio:"
-						+ DashboardUIGenerator.convertDouble2DigitPrecison(buyerCallWeightVsbuyerTierWeightRatio) + "<br/>");
+				auditRotingLogic
+						.append(eligibleBuyerInCurrentTier.getBuyer_name()
+								+ ": "
+								+ eligibleBuyerInCurrentTier.getBuyer_number()
+								+ ":"
+								+ " Normalized Buyer Weight Vs Total Tier Weight Ratio:"
+								+ DashboardUIGenerator
+										.convertDouble2DigitPrecison(buyerCallWeightVsbuyerTierWeightRatio)
+								+ "<br/>");
 
 				counter++;
 
@@ -387,12 +441,14 @@ public class CallRoutingServiceV2 {
 
 			auditRotingLogic
 					.append("<span style=\"color:green;font-weight: 600;\"> Minimum Value of Buyer's Call Weight Vs Buyer's  Tier Weight Ratio:"
-							+ DashboardUIGenerator.convertDouble2DigitPrecison(minimumBuyerCallWeightVsbuyerTierWeightRatio)
-							+  " </span><br/>");
+							+ DashboardUIGenerator
+									.convertDouble2DigitPrecison(minimumBuyerCallWeightVsbuyerTierWeightRatio)
+							+ " </span><br/>");
 
 			List<Buyer> buyersQualifingMinimumBuyerCallWeightVsbuyerTierWeightRatio = new ArrayList<Buyer>();
-			
-			auditRotingLogic.append("<br>Buyers with Minimum call Weight Ratio</br>");
+
+			auditRotingLogic
+					.append("<br>Buyers with Minimum call Weight Ratio</br>");
 
 			counter = 0;
 			for (Buyer eligibleBuyerInCurrentTier : eligibleBuyersInCurrentTier) {
@@ -445,13 +501,16 @@ public class CallRoutingServiceV2 {
 			// If more than 1 max buyer weight
 			if (buyersQualifingMinimumBuyerCallWeightVsbuyerTierWeightRatioAndEqualMaxWeight
 					.size() > 1) {
-				auditRotingLogic.append("More than 1 buyer selected..  Doing Random Allocation <br/>");
-				
+				auditRotingLogic
+						.append("More than 1 buyer selected..  Doing Random Allocation <br/>");
+
 				for (Buyer buyer : buyersQualifingMinimumBuyerCallWeightVsbuyerTierWeightRatioAndEqualMaxWeight) {
-					auditRotingLogic.append( " Random Buyer: "+buyer.getBuyer_name()+": "+ buyer.getBuyer_number()+" <br/>");
+					auditRotingLogic.append(" Random Buyer: "
+							+ buyer.getBuyer_name() + ": "
+							+ buyer.getBuyer_number() + " <br/>");
 
 				}
-				
+
 				int qualifiedBuyersSize = buyersQualifingMinimumBuyerCallWeightVsbuyerTierWeightRatioAndEqualMaxWeight
 						.size();
 				Random random = new Random();
@@ -463,19 +522,21 @@ public class CallRoutingServiceV2 {
 
 				Buyer selectedBuyer = buyersQualifingMinimumBuyerCallWeightVsbuyerTierWeightRatio
 						.get(selectedBuyerIndex);
-				auditRotingLogic.append("<span style=\"color:green;font-weight: 600;\">  Selected byer for allocation is : "
-						+ selectedBuyer.getBuyer_name() + "</span><br/>");
+				auditRotingLogic
+						.append("<span style=\"color:green;font-weight: 600;\">  Selected byer for allocation is : "
+								+ selectedBuyer.getBuyer_name()
+								+ "</span><br/>");
 
-			//	System.out.println(auditRotingLogic.toString());
+				// System.out.println(auditRotingLogic.toString());
 
 				return selectedBuyer;
 			}
 
 		}
 
-		
-		auditRotingLogic.append(" <span style=\"color:red\">  </span>No Buyer Found, Now trying amongts Dups Buyers and Priviously tried failed buyers again <br/> </span>");
-		
+		auditRotingLogic
+				.append(" <span style=\"color:red\">  </span>No Buyer Found, Now trying amongts Dups Buyers and Priviously tried failed buyers again <br/> </span>");
+
 		// Coming here mean everything is full, allocating buyer from Duplicate
 		// list
 
@@ -504,8 +565,13 @@ public class CallRoutingServiceV2 {
 						.getBuyer_daily_cap())
 						&& (excludedBuyer.getBuyer_daily_cap() != -1))
 					continue;
-				else{
-					auditRotingLogic.append(" <span style=\"color:green;font-weight: 600;\">Selected Buyer from previously Excluded buyer being used for routing is  "+excludedBuyer.getBuyer_name() +":" + excludedBuyer.getBuyer_number()+"  </span> <br/>");
+				else {
+					auditRotingLogic
+							.append(" <span style=\"color:green;font-weight: 600;\">Selected Buyer from previously Excluded buyer being used for routing is  "
+									+ excludedBuyer.getBuyer_name()
+									+ ":"
+									+ excludedBuyer.getBuyer_number()
+									+ "  </span> <br/>");
 					return excludedBuyer;
 				}
 
@@ -513,9 +579,9 @@ public class CallRoutingServiceV2 {
 
 		}
 
-		auditRotingLogic.append(" <span style=\"color:red\">No buyer found for allocation even from excluded list, this call will now be rejected   </span> <br/> </span>");
+		auditRotingLogic
+				.append(" <span style=\"color:red\">No buyer found for allocation even from excluded list, this call will now be rejected   </span> <br/> </span>");
 
-		
 		return null;
 
 	}
@@ -553,7 +619,6 @@ public class CallRoutingServiceV2 {
 
 		return counter;
 	}
-
 
 	private static int checkNumberofCallsforBuyer(Buyer chooseBuyer) {
 
@@ -725,33 +790,32 @@ public class CallRoutingServiceV2 {
 				.removeDuplicateZeroSecondCallsFromCurrentUserAndNoBuyer(callModel);
 
 		if ("0".equals(callModel.getBillDuration())
-				|| callModel.getError_code() != null || buyer == null || (!callModel.isBuyerAndCostumerConnected())) {
+				|| callModel.getError_code() != null || buyer == null
+				|| (!callModel.isBuyerAndCostumerConnected())) {
 			callModel.setTraffic_source_revenue(0.0);
 			callModel.setBuyer_revenue(0.0);
 
 		}
-		
-		
+
 		String no_connect_cause = "";
-		
-		if(!callModel.isBuyerAndCostumerConnected() && "NORMAL_CLEARING".equals(callModel.getHangupCause())) {
-			//This means buyer was not allocated and customer disconnected
+
+		if (!callModel.isBuyerAndCostumerConnected()
+				&& "NORMAL_CLEARING".equals(callModel.getHangupCause())) {
+			// This means buyer was not allocated and customer disconnected
 			no_connect_cause = "Customer Disconnected Call";
 		}
 
 		/*
-		if (buyer == null && "no-answer".equals(callModel.getCallStatusAtHangup())) {
-			// this mean route was busy, keep it in hold buyers for sometime
-			HoldBuyer holdBuyer = new HoldBuyer();
-			holdBuyer.setBuyer(buyer);
-			holdBuyers.add(holdBuyer);
+		 * if (buyer == null &&
+		 * "no-answer".equals(callModel.getCallStatusAtHangup())) { // this mean
+		 * route was busy, keep it in hold buyers for sometime HoldBuyer
+		 * holdBuyer = new HoldBuyer(); holdBuyer.setBuyer(buyer);
+		 * holdBuyers.add(holdBuyer);
+		 * 
+		 * }
+		 */
 
-		}
-		*/
-		
-		callModel  = populateBuyerSideCallDetails(callModel);
-		
-		
+		callModel = populateBuyerSideCallDetails(callModel);
 
 		Connection conn = ProjectUtils.getMySQLConnection();
 
@@ -791,7 +855,7 @@ public class CallRoutingServiceV2 {
 			stmt.setString(counter++, callModel.getBuyers_tried());
 			stmt.setString(counter++, callModel.getBuyer_hangup_reason());
 			stmt.setString(counter++, no_connect_cause);
-			
+
 			stmt.setString(counter++, callModel.getUuid());
 
 			stmt.executeUpdate();
@@ -816,10 +880,9 @@ public class CallRoutingServiceV2 {
 
 		return callModel;
 	}
-	
-	
-	public static CallModel updateCallModelWithConferenceForTwillo(CallModel callModel)
-			throws Exception {
+
+	public static CallModel updateCallModelWithConferenceForTwillo(
+			CallModel callModel) throws Exception {
 
 		int buyer_id = callModel.getBuyer_id();
 
@@ -869,18 +932,16 @@ public class CallRoutingServiceV2 {
 		}
 
 		/*
-		if (buyer == null && "no-answer".equals(callModel.getCallStatusAtHangup())) {
-			// this mean route was busy, keep it in hold buyers for sometime
-			HoldBuyer holdBuyer = new HoldBuyer();
-			holdBuyer.setBuyer(buyer);
-			holdBuyers.add(holdBuyer);
+		 * if (buyer == null &&
+		 * "no-answer".equals(callModel.getCallStatusAtHangup())) { // this mean
+		 * route was busy, keep it in hold buyers for sometime HoldBuyer
+		 * holdBuyer = new HoldBuyer(); holdBuyer.setBuyer(buyer);
+		 * holdBuyers.add(holdBuyer);
+		 * 
+		 * }
+		 */
 
-		}
-		*/
-		
-		callModel  = populateBuyerSideCallDetails(callModel);
-		
-		
+		callModel = populateBuyerSideCallDetails(callModel);
 
 		Connection conn = ProjectUtils.getMySQLConnection();
 
@@ -924,10 +985,8 @@ public class CallRoutingServiceV2 {
 			stmt.setInt(counter++, buyer.getBuyer_id());
 			stmt.setString(counter++, buyer.getBuyer_number());
 
-
-			
 			stmt.setString(counter++, callModel.getUuid());
-	
+
 			stmt.executeUpdate();
 
 		}
@@ -950,64 +1009,64 @@ public class CallRoutingServiceV2 {
 
 		return callModel;
 	}
-	
-	
 
 	private static CallModel populateBuyerSideCallDetails(CallModel callModel) {
-		
-		try {
-		
-		List<OutboundCallModel> outBoundCalls = CallsDaoService.populateBuyerSideCallDetails( callModel);
-		
-		if(outBoundCalls.size() == 0)
-			return callModel;
-		
 
-		
-		if(outBoundCalls.size() == 1) {
-			long  conferenceStartTime = outBoundCalls.get(0).getConferencestarttime().getTime();
-			long  conferenceEndTime = outBoundCalls.get(0).getConferenceendtime().getTime();
-			long  buyer_connecting_time = outBoundCalls.get(0).getAnswertime().getTime()- callModel.getCallLandingTimeOnServer().getTime();
-		
-			callModel.setConnected_time((int)((conferenceEndTime-conferenceStartTime)/1000));
-			callModel.setBuyer_connecting_time((int)(buyer_connecting_time/1000));
-			
-		}
-		
-		
+		try {
+
+			List<OutboundCallModel> outBoundCalls = CallsDaoService
+					.populateBuyerSideCallDetails(callModel);
+
+			if (outBoundCalls.size() == 0)
+				return callModel;
+
+			if (outBoundCalls.size() == 1) {
+				long conferenceStartTime = outBoundCalls.get(0)
+						.getConferencestarttime().getTime();
+				long conferenceEndTime = outBoundCalls.get(0)
+						.getConferenceendtime().getTime();
+				long buyer_connecting_time = outBoundCalls.get(0)
+						.getAnswertime().getTime()
+						- callModel.getCallLandingTimeOnServer().getTime();
+
+				callModel
+						.setConnected_time((int) ((conferenceEndTime - conferenceStartTime) / 1000));
+				callModel
+						.setBuyer_connecting_time((int) (buyer_connecting_time / 1000));
+
+			}
+
 			callModel.setCallattempts(outBoundCalls.size());
 
 			StringBuffer buyer_hangup_reasons = new StringBuffer();
 			StringBuffer buyers_tried = new StringBuffer();
 
-			
 			for (OutboundCallModel outboundCallModel : outBoundCalls) {
-				
-				String buyerName = cachedbuyersMapByPhoneNumber.get(outboundCallModel.getTo()).getBuyer_name();
+
+				String buyerName = cachedbuyersMapByPhoneNumber.get(
+						outboundCallModel.getTo()).getBuyer_name();
 				String hangupReason = outboundCallModel.getHangupcause();
-				
-				if(buyerName == null) 
+
+				if (buyerName == null)
 					buyerName = "";
-				
-				if(hangupReason == null)
+
+				if (hangupReason == null)
 					hangupReason = "";
-				
-				buyers_tried.append(buyerName+",");
-				buyer_hangup_reasons.append(hangupReason+",");
-			
+
+				buyers_tried.append(buyerName + ",");
+				buyer_hangup_reasons.append(hangupReason + ",");
+
 			}
-			
-			
-		callModel.setBuyers_tried(buyers_tried.toString());
-		callModel.setBuyer_hangup_reason(buyer_hangup_reasons.toString());
-		}
-		catch (Exception e) {
+
+			callModel.setBuyers_tried(buyers_tried.toString());
+			callModel.setBuyer_hangup_reason(buyer_hangup_reasons.toString());
+		} catch (Exception e) {
 			System.out.println("Exception in populateBuyerSideCallDetails");
 			e.printStackTrace();
 		}
-		
+
 		return callModel;
-		
+
 	}
 
 	public static java.util.Date convertPlivoDateToJavaDate(String dateStr) {
@@ -1250,15 +1309,14 @@ public class CallRoutingServiceV2 {
 
 				callModel.setDuration(rs.getString("duration"));
 				callModel.setHangupEvent(rs.getString("hangupEvent"));
-				
+
 				callModel.setCity(rs.getString("city"));
 				callModel.setState(rs.getString("state"));
 				callModel.setCountry(rs.getString("country"));
 				callModel.setLatitue(rs.getString("latitude"));
 				callModel.setLongitude(rs.getString("longitude"));
 				callModel.setPhoneProvider(rs.getString("phoneprovider"));
-				
-				
+
 				callModel.setCallStatusAtHangup(rs
 						.getString("callStatusAtHangup"));
 				callModel.setCall_buyer(cachedbuyersMap.get(callModel
@@ -1494,8 +1552,5 @@ public class CallRoutingServiceV2 {
 		return cachedTrafficsourcesMap;
 
 	}
-
-	
-
 
 }

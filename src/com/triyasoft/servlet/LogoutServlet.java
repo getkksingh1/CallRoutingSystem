@@ -21,33 +21,33 @@ import com.triyasoft.utils.ProjectUtils;
 @WebServlet("/LogoutServlet")
 public class LogoutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	response.setContentType("text/html");
-    	Cookie loginCookie = null;
-    	Cookie[] cookies = request.getCookies();
-    	if(cookies != null){
-    	for(Cookie cookie : cookies){
-    		if(cookie.getName().equals(Constans.REMEMBER_ME_COOKIE_NAME)){
-    			loginCookie = cookie;
-    			
-    			break;
-    		}
-    	}
-    	}
-    	
-    	UserModel user = (UserModel)request.getSession().getAttribute("user");
-    	UsersDao.deleteSession(user);
-    	
-    	if(loginCookie != null){
-    		loginCookie.setMaxAge(0);
-        	response.addCookie(loginCookie);
-    	}
-    	request.getSession().removeAttribute("user");
+
+	protected void service(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("text/html");
+		Cookie loginCookie = null;
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(Constans.REMEMBER_ME_COOKIE_NAME)) {
+					loginCookie = cookie;
+
+					break;
+				}
+			}
+		}
+
+		UserModel user = (UserModel) request.getSession().getAttribute("user");
+		UsersDao.deleteSession(user);
+
+		if (loginCookie != null) {
+			loginCookie.setMaxAge(0);
+			response.addCookie(loginCookie);
+		}
+		request.getSession().removeAttribute("user");
 		String baseURL = ProjectUtils.getBaseURL(request);
 
-    	
-    	response.sendRedirect(baseURL+"/login.jsp");
-    }
+		response.sendRedirect(baseURL + "/login.jsp");
+	}
 
 }

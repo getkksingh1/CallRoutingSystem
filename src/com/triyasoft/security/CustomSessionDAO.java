@@ -17,8 +17,7 @@ public class CustomSessionDAO implements SessionDAO {
 
 	@Override
 	public void delete(Session arg0) {
-		
-		
+
 	}
 
 	@Override
@@ -36,7 +35,6 @@ public class CustomSessionDAO implements SessionDAO {
 	@Override
 	public void update(Session arg0) throws UnknownSessionException {
 
-		
 	}
 
 }

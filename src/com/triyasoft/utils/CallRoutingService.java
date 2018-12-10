@@ -57,10 +57,6 @@ public class CallRoutingService {
 	public static boolean isdataLoaded = false;
 
 	public static int loopcount = 0;
-	
-	
-	
-
 
 	public static void main(String[] args) {
 
@@ -996,15 +992,14 @@ public class CallRoutingService {
 
 				callModel.setDuration(rs.getString("duration"));
 				callModel.setHangupEvent(rs.getString("hangupEvent"));
-				
+
 				callModel.setCity(rs.getString("city"));
 				callModel.setState(rs.getString("state"));
 				callModel.setCountry(rs.getString("country"));
 				callModel.setLatitue(rs.getString("latitude"));
 				callModel.setLongitude(rs.getString("longitude"));
 				callModel.setPhoneProvider(rs.getString("phoneprovider"));
-				
-				
+
 				callModel.setCallStatusAtHangup(rs
 						.getString("callStatusAtHangup"));
 				callModel.setCall_buyer(cachedbuyersMap.get(callModel

@@ -12,13 +12,13 @@ public class LoadOnStartServlet extends HttpServlet {
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
-		
-		String contextPath  = config.getServletContext().getContextPath();
+
+		String contextPath = config.getServletContext().getContextPath();
 		contextPath = contextPath.replaceAll("/", "");
-		System.out.println("App Context is: "+contextPath);
+		System.out.println("App Context is: " + contextPath);
 		ProjectUtils.currentAppContext = contextPath;
 		AppSettingsDao.loadAllAppSettings();
-	//	CallcenterCallAllocationService.loadInitdata();
-		
-		}
+		// CallcenterCallAllocationService.loadInitdata();
+
+	}
 }

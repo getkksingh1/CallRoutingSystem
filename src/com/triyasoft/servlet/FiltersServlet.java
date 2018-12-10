@@ -25,245 +25,183 @@ import com.triyasoft.utils.JsonWrapper;
 import com.triyasoft.utils.JsonWrapper1;
 
 @WebServlet("/filters")
-public class FiltersServlet  extends HttpServlet{
+public class FiltersServlet extends HttpServlet {
 
+	@Override
+	protected void service(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-	
-	
-	
-	 @Override
-	    protected void service(HttpServletRequest request, HttpServletResponse response)
-	            throws ServletException, IOException {
-		 
-				 
-					String requestType = request.getParameter("requestType");
+		String requestType = request.getParameter("requestType");
 
-						
-						
-					
-					if("loadfilters".equals(requestType)) {
-						
-					
-						String jtSorting = request.getParameter("jtSorting");
-						
-						List<BuyerSourcePreferenceFilter> lst = BuyerSourcePreferenceFilterDao.loadAllFiltersIncludingInActive();
-						
-						
-						
-						Gson gson = new Gson();
-						
-						
-						JsonWrapper wrapper = new JsonWrapper();
-						wrapper.setResult("OK");
-						
-						 
-						wrapper.setTotalRecordCount(lst.size());
+		if ("loadfilters".equals(requestType)) {
 
-						
-						
-					
-						Object[] objarr = lst.toArray();
-						
-						wrapper.setRecords(lst.toArray());
+			String jtSorting = request.getParameter("jtSorting");
 
-						
-						// 2. Java object to JSON, and assign to a String
-						String jsonInString = gson.toJson(wrapper);
-						
-						response.getWriter().print(jsonInString);
+			List<BuyerSourcePreferenceFilter> lst = BuyerSourcePreferenceFilterDao
+					.loadAllFiltersIncludingInActive();
 
-					}			
-					
-			
-					
-					if("deletefilter".equals(requestType)) {
-						
-						String id =  request.getParameter("id");
-						System.out.println("Removing filter with id :"+id);
-						BuyerSourcePreferenceFilterDao.deleteFilter(id);
-						response.getWriter().print("{\"Result\":\"OK\"}");
-						
-			    		BuyerSourcePreferenceFilterDao.loadAllFilters();
+			Gson gson = new Gson();
 
-						
-					}
-					
-					if("updatefilter".equals(requestType)) {
-						
-						String id =  request.getParameter("id");
-						System.out.println("buyer_id:"+id);
-						
-						String source_id = request.getParameter("source_id");
-						System.out.println("source_id:"+source_id);
+			JsonWrapper wrapper = new JsonWrapper();
+			wrapper.setResult("OK");
 
-						String operator = request.getParameter("operator");
-						System.out.println("operator:"+operator);
+			wrapper.setTotalRecordCount(lst.size());
 
-						String buyer_id = request.getParameter("buyer_id");
-						System.out.println("buyer_id:"+buyer_id);
+			Object[] objarr = lst.toArray();
 
-						String is_active = request.getParameter("is_active");
-						System.out.println("is_active:"+is_active);
+			wrapper.setRecords(lst.toArray());
 
-					
-						if(is_active == null)
-							is_active = "0";
-						
-						System.out.println("is_active:"+is_active);
+			// 2. Java object to JSON, and assign to a String
+			String jsonInString = gson.toJson(wrapper);
 
-						
-						 BuyerSourcePreferenceFilterDao.updateFilter(id,source_id,operator,buyer_id, is_active);
+			response.getWriter().print(jsonInString);
 
+		}
 
+		if ("deletefilter".equals(requestType)) {
 
-				    		BuyerSourcePreferenceFilterDao.loadAllFilters();
+			String id = request.getParameter("id");
+			System.out.println("Removing filter with id :" + id);
+			BuyerSourcePreferenceFilterDao.deleteFilter(id);
+			response.getWriter().print("{\"Result\":\"OK\"}");
 
-						
+			BuyerSourcePreferenceFilterDao.loadAllFilters();
 
-						response.getWriter().print("{\"Result\":\"OK\"}");
+		}
 
-						
-					}
-					
-					if("addfilter".equals(requestType)) {
-						
-		                    
+		if ("updatefilter".equals(requestType)) {
 
-						
-						
-						
-						String source_id = request.getParameter("source_id");
-						System.out.println("source_id:"+source_id);
+			String id = request.getParameter("id");
+			System.out.println("buyer_id:" + id);
 
-						String operator = request.getParameter("operator");
-						System.out.println("operator:"+operator);
+			String source_id = request.getParameter("source_id");
+			System.out.println("source_id:" + source_id);
 
-						String buyer_id = request.getParameter("buyer_id");
-						System.out.println("buyer_id:"+buyer_id);
+			String operator = request.getParameter("operator");
+			System.out.println("operator:" + operator);
 
-						String is_active = request.getParameter("is_active");
-						System.out.println("is_active:"+is_active);
+			String buyer_id = request.getParameter("buyer_id");
+			System.out.println("buyer_id:" + buyer_id);
 
-					
-						if(is_active == null)
-							is_active = "0";
-						
-						System.out.println("is_active:"+is_active);
+			String is_active = request.getParameter("is_active");
+			System.out.println("is_active:" + is_active);
 
-						
-						BuyerSourcePreferenceFilter filter = BuyerSourcePreferenceFilterDao.addFilter(source_id,operator,buyer_id, is_active);
+			if (is_active == null)
+				is_active = "0";
 
-						Gson gson = new Gson();
+			System.out.println("is_active:" + is_active);
 
-						
-						JsonWrapper1 wrapper = new JsonWrapper1();
-						wrapper.setResult("OK");
-						wrapper.setRecords(filter);
-						
-						String jsonInString = gson.toJson(wrapper);
-						
-						response.getWriter().print(jsonInString);
+			BuyerSourcePreferenceFilterDao.updateFilter(id, source_id,
+					operator, buyer_id, is_active);
 
-						BuyerSourcePreferenceFilterDao.loadAllFilters();
+			BuyerSourcePreferenceFilterDao.loadAllFilters();
 
-						
-					}
-					
-					if("loadBuyersOption".equals(requestType)) {
+			response.getWriter().print("{\"Result\":\"OK\"}");
 
-						
+		}
 
-						
-					
-						
-						Gson gson = new Gson();
-						
-						System.out.println("Reaching here");
-						
-						JsonOptionsWrapper wrapper = new JsonOptionsWrapper();
-						wrapper.setResult("OK");
-						
-						List<Buyer> lst = BuyerDaoService.loadAllBuyers();
-						List<Option> sourceOptions = new ArrayList<Option>();
-						
-						for (Buyer buyer : lst) {
-							
-							Option option = new Option();
-							option.setDisplayText(buyer.getBuyer_name());
-							option.setValue(buyer.getBuyer_id()+"");
-							sourceOptions.add(option);
-						}
-						
-						
+		if ("addfilter".equals(requestType)) {
 
-						
-						
-					
-						Object[] objarr = sourceOptions.toArray();
-						
-						wrapper.setOptions(objarr);
+			String source_id = request.getParameter("source_id");
+			System.out.println("source_id:" + source_id);
 
-						
-						// 2. Java object to JSON, and assign to a String
-						String jsonInString = gson.toJson(wrapper);
-						
-						response.getWriter().print(jsonInString);
+			String operator = request.getParameter("operator");
+			System.out.println("operator:" + operator);
 
-					
-						
-					
-					}
-					
+			String buyer_id = request.getParameter("buyer_id");
+			System.out.println("buyer_id:" + buyer_id);
 
-	 }
-	 
-	 
-	 
-	 public static void main(String[] args) {
+			String is_active = request.getParameter("is_active");
+			System.out.println("is_active:" + is_active);
 
-		 /*
-		 Map<Integer, Buyer> buyersMap = CallRoutingService.loadBuyers(false);
-		 Iterator it = buyersMap.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        System.out.println(pair.getKey() + " = " + pair.getValue());
-		        Buyer buyer = (Buyer) pair.getValue() ;
-		        System.out.println(buyer);
-		        it.remove(); // avoids a ConcurrentModificationException
-		    }
-		 
-		 */
-		 
-		 
-		 
-		 Map<Integer, PhoneNumber> phoneNumbersMap = CallRoutingServiceV2.loadPhoneNumbers(false);
-		
+			if (is_active == null)
+				is_active = "0";
 
-		 Iterator it = phoneNumbersMap.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        System.out.println(pair.getKey() + " = " + pair.getValue());
-		        PhoneNumber phoneNumber = (PhoneNumber) pair.getValue() ;
-		        System.out.println(phoneNumber);
-		        it.remove(); // avoids a ConcurrentModificationException
-		    }
-		    
-		    
-		 
-		 /*
-		 Map<Integer, TrafficSource> trafficSourceMap = CallRoutingService.loadTrafficSources(false);
-		 Iterator it = trafficSourceMap.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        System.out.println(pair.getKey() + " = " + pair.getValue());
-		        TrafficSource trafficSource = (TrafficSource) pair.getValue() ;
-		        System.out.println(trafficSource);
-		        it.remove(); // avoids a ConcurrentModificationException
-		    }
-		    */
+			System.out.println("is_active:" + is_active);
+
+			BuyerSourcePreferenceFilter filter = BuyerSourcePreferenceFilterDao
+					.addFilter(source_id, operator, buyer_id, is_active);
+
+			Gson gson = new Gson();
+
+			JsonWrapper1 wrapper = new JsonWrapper1();
+			wrapper.setResult("OK");
+			wrapper.setRecords(filter);
+
+			String jsonInString = gson.toJson(wrapper);
+
+			response.getWriter().print(jsonInString);
+
+			BuyerSourcePreferenceFilterDao.loadAllFilters();
+
+		}
+
+		if ("loadBuyersOption".equals(requestType)) {
+
+			Gson gson = new Gson();
+
+			System.out.println("Reaching here");
+
+			JsonOptionsWrapper wrapper = new JsonOptionsWrapper();
+			wrapper.setResult("OK");
+
+			List<Buyer> lst = BuyerDaoService.loadAllBuyers();
+			List<Option> sourceOptions = new ArrayList<Option>();
+
+			for (Buyer buyer : lst) {
+
+				Option option = new Option();
+				option.setDisplayText(buyer.getBuyer_name());
+				option.setValue(buyer.getBuyer_id() + "");
+				sourceOptions.add(option);
+			}
+
+			Object[] objarr = sourceOptions.toArray();
+
+			wrapper.setOptions(objarr);
+
+			// 2. Java object to JSON, and assign to a String
+			String jsonInString = gson.toJson(wrapper);
+
+			response.getWriter().print(jsonInString);
+
+		}
+
 	}
-	 
 
+	public static void main(String[] args) {
 
-	
+		/*
+		 * Map<Integer, Buyer> buyersMap = CallRoutingService.loadBuyers(false);
+		 * Iterator it = buyersMap.entrySet().iterator(); while (it.hasNext()) {
+		 * Map.Entry pair = (Map.Entry)it.next();
+		 * System.out.println(pair.getKey() + " = " + pair.getValue()); Buyer
+		 * buyer = (Buyer) pair.getValue() ; System.out.println(buyer);
+		 * it.remove(); // avoids a ConcurrentModificationException }
+		 */
+
+		Map<Integer, PhoneNumber> phoneNumbersMap = CallRoutingServiceV2
+				.loadPhoneNumbers(false);
+
+		Iterator it = phoneNumbersMap.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pair = (Map.Entry) it.next();
+			System.out.println(pair.getKey() + " = " + pair.getValue());
+			PhoneNumber phoneNumber = (PhoneNumber) pair.getValue();
+			System.out.println(phoneNumber);
+			it.remove(); // avoids a ConcurrentModificationException
+		}
+
+		/*
+		 * Map<Integer, TrafficSource> trafficSourceMap =
+		 * CallRoutingService.loadTrafficSources(false); Iterator it =
+		 * trafficSourceMap.entrySet().iterator(); while (it.hasNext()) {
+		 * Map.Entry pair = (Map.Entry)it.next();
+		 * System.out.println(pair.getKey() + " = " + pair.getValue());
+		 * TrafficSource trafficSource = (TrafficSource) pair.getValue() ;
+		 * System.out.println(trafficSource); it.remove(); // avoids a
+		 * ConcurrentModificationException }
+		 */
+	}
+
 }

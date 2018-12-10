@@ -11,21 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 import com.triyasoft.daos.ContactDao;
 
 @WebServlet("/contacts")
-public class ContactServlet extends HttpServlet{
-	
-	
-	 @Override
-	    protected void service(HttpServletRequest request, HttpServletResponse response)
-	            throws ServletException, IOException {
-		 
-				 
-					String requestType = request.getParameter("requestType");
-					if("blockcontact".equals(requestType)) {
-						String contactNumber = request.getParameter("number");
-						ContactDao.addBlockedContact(contactNumber);
-					}
-					
-					
-					
-	 }
+public class ContactServlet extends HttpServlet {
+
+	@Override
+	protected void service(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+
+		String requestType = request.getParameter("requestType");
+		if ("blockcontact".equals(requestType)) {
+			String contactNumber = request.getParameter("number");
+			ContactDao.addBlockedContact(contactNumber);
+		}
+
+	}
 }

@@ -12,87 +12,77 @@ import com.triyasoft.utils.ProjectUtils;
 public class ConferenceDao {
 
 	public static int getNextConferenceID() {
-		
-		   
-		   PreparedStatement stmt = null;
-	       Connection conn = ProjectUtils.getMySQLConnection();
-	       String uuid = "";
 
-			     
-			        try
-		       		{
-	
-			        uuid = String.valueOf(UUID.randomUUID());
-			        stmt = conn.prepareStatement("insert into conference (row_key_uuid) values (?)");
-		            int counter =1;
-		            
-		            stmt.setString(counter++,uuid);
-		            stmt.executeUpdate();
+		PreparedStatement stmt = null;
+		Connection conn = ProjectUtils.getMySQLConnection();
+		String uuid = "";
 
-		       		}
-			        
-		        catch(SQLException se)
-		         {
-		            //Handle errors for JDBC
-		            se.printStackTrace();
-		         }
+		try {
 
-		         catch(Exception e){
-		            //Handle errors for Class.forName
-		            e.printStackTrace();
-		         }
-			        
-			        finally {
-			        	ProjectUtils.closeConnection(null, stmt, conn);
-			        }
-			       
-		
+			uuid = String.valueOf(UUID.randomUUID());
+			stmt = conn
+					.prepareStatement("insert into conference (row_key_uuid) values (?)");
+			int counter = 1;
+
+			stmt.setString(counter++, uuid);
+			stmt.executeUpdate();
+
+		}
+
+		catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
+
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		}
+
+		finally {
+			ProjectUtils.closeConnection(null, stmt, conn);
+		}
+
 		return findIdByUUID(uuid);
-		
+
 	}
-	
-	
-	public  static int findIdByUUID(String uuid) {
-		
-		
+
+	public static int findIdByUUID(String uuid) {
+
 		Statement stmt = null;
-		ResultSet rs =  null;
-	    Connection conn = ProjectUtils.getMySQLConnection();
+		ResultSet rs = null;
+		Connection conn = ProjectUtils.getMySQLConnection();
 
-		  try
-    		{
-		
-		       stmt = conn.createStatement();
-				
-				 rs = stmt.executeQuery("select * from conference where row_key_uuid='"+uuid+"';");
-				
-				while(rs.next()) {
-					
-					return rs.getInt("id");
-					
-				}
-    		}
-	        
-	        catch(SQLException se)
-	         {
-	            //Handle errors for JDBC
-	            se.printStackTrace();
-	         }
+		try {
 
-	         catch(Exception e){
-	            //Handle errors for Class.forName
-	            e.printStackTrace();
-	         }
-		        
-		        finally{
-		        	ProjectUtils.closeConnection(rs,stmt,conn);
-		     }
-		
-		  
-		  return -1;
+			stmt = conn.createStatement();
+
+			rs = stmt
+					.executeQuery("select * from conference where row_key_uuid='"
+							+ uuid + "';");
+
+			while (rs.next()) {
+
+				return rs.getInt("id");
+
+			}
+		}
+
+		catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		}
+
+		catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		}
+
+		finally {
+			ProjectUtils.closeConnection(rs, stmt, conn);
+		}
+
+		return -1;
 	}
-	
-	
-	
-	
+
 }

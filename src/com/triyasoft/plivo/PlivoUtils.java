@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import com.triyasoft.trackdrive.BuyerResponse;
 
 public class PlivoUtils {
-	
+
 	public static void main(String[] args) {
 		try {
 			String webPage = "https://api.plivo.com/v1/Account/MAODJKN2MZOGE4OTNHNJ/Call/d387001e-5930-11e7-adae-5fa4a6c35b50/";
@@ -29,7 +29,8 @@ public class PlivoUtils {
 
 			URL url = new URL(webPage);
 			URLConnection urlConnection = url.openConnection();
-			urlConnection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+			urlConnection.setRequestProperty("Authorization", "Basic "
+					+ authStringEnc);
 			InputStream is = urlConnection.getInputStream();
 			InputStreamReader isr = new InputStreamReader(is);
 
@@ -40,11 +41,11 @@ public class PlivoUtils {
 				sb.append(charArray, 0, numCharsRead);
 			}
 			String result = sb.toString();
-			
-			Gson gson = new Gson();
-			
-			PlivoCallResponseModel plivoCallResponseModel = gson.fromJson(result, PlivoCallResponseModel.class);
 
+			Gson gson = new Gson();
+
+			PlivoCallResponseModel plivoCallResponseModel = gson.fromJson(
+					result, PlivoCallResponseModel.class);
 
 			System.out.println("*** BEGIN ***");
 			System.out.println(result);

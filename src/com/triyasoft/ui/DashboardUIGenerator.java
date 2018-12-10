@@ -12,16 +12,16 @@ import org.apache.commons.lang.text.StrSubstitutor;
 
 import com.triyasoft.daos.TemplatesDao;
 import com.triyasoft.model.DashboardDataModel;
-import com.triyasoft.model.HeaderSummaryModel;
 import com.triyasoft.model.DashboardDataModel.BuyerConversion;
 import com.triyasoft.model.DashboardDataModel.BuyerRevenue;
 import com.triyasoft.model.DashboardDataModel.BuyersSummary;
+import com.triyasoft.model.DashboardDataModel.BuyersSummary.BuyerSummary;
 import com.triyasoft.model.DashboardDataModel.OnGoingCalls;
 import com.triyasoft.model.DashboardDataModel.PhoneCost;
 import com.triyasoft.model.DashboardDataModel.Profit;
 import com.triyasoft.model.DashboardDataModel.TrafficSourcesSummary;
-import com.triyasoft.model.DashboardDataModel.BuyersSummary.BuyerSummary;
 import com.triyasoft.model.DashboardDataModel.TrafficSourcesSummary.TrafficSourceSummary;
+import com.triyasoft.model.HeaderSummaryModel;
 import com.triyasoft.utils.ProjectUtils;
 
 public class DashboardUIGenerator {
@@ -1015,7 +1015,8 @@ public class DashboardUIGenerator {
 		String headerStripContent  = "";
 		
 		try {
-		String template  = templatesMap.get("dashboardpageheaderblackstrip"); //new String(Files.readAllBytes(Paths.get("/Users/abc/Documents/workspace/CallTracker/src/com/triyasoft/templates/ProfitTemplate")));
+			String template = templatesMap.get("dashboardpageheaderblackstrip"); // new
+																					// String(Files.readAllBytes(Paths.get("/Users/abc/Documents/workspace/CallTracker/src/com/triyasoft/templates/ProfitTemplate")));
 		Map<String, String> valuesMap = new HashMap<String, String>();
 		
 		valuesMap.put("ActiveCalls", hsm.getActiveCalls()+"");

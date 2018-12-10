@@ -34,32 +34,30 @@ public class EmailValidator {
 	 * @param email
 	 * @return boolean
 	 */
-	
+
 	public static void main(String[] args) throws Exception {
-		
-		
-		 File fin = new File("/Users/abc/Documents/workspace/CallTracker/src/com/triyasoft/plivo/emaillist");
-			//  File fin = new File("/Users/abc/Documents/workspace/CallTracker/src/com/triyasoft/plivo/hp-realtime");
-		  
-			  
-			 FileInputStream fis = new FileInputStream(fin);
-			    
-				//Construct BufferedReader from InputStreamReader
-			 		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-			 
-				String line = null;
-				
-				
-				int counter = 0;
-				
-				
-				while ((line = br.readLine()) != null) {
-					boolean isValidEmail = validateEmail(line.trim());
-					if(isValidEmail)
-						System.out.println(line.trim());
-				}
+
+		File fin = new File(
+				"/Users/abc/Documents/workspace/CallTracker/src/com/triyasoft/plivo/emaillist");
+		// File fin = new
+		// File("/Users/abc/Documents/workspace/CallTracker/src/com/triyasoft/plivo/hp-realtime");
+
+		FileInputStream fis = new FileInputStream(fin);
+
+		// Construct BufferedReader from InputStreamReader
+		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+		String line = null;
+
+		int counter = 0;
+
+		while ((line = br.readLine()) != null) {
+			boolean isValidEmail = validateEmail(line.trim());
+			if (isValidEmail)
+				System.out.println(line.trim());
+		}
 	}
-	
+
 	public static boolean validateEmail(String email) {
 		new EmailValidator();
 		matcher = pattern.matcher(email);
