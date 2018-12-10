@@ -1,0 +1,4 @@
+<rule>
+        <from>/provider/([a-z]+)/legs/([0-9]+)/([a-z]+)</from>
+        <to>/outboundcallservlet?provider=$1&amp;legid=$2&amp;requestType=$3</to>
+</rule>

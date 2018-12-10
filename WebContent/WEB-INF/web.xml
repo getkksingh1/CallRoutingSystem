@@ -1,0 +1,67 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+  <description>MySQL Test App</description>
+  
+  
+  
+  <filter>
+   <filter-name>SecurityFilter</filter-name>
+   <filter-class>com.triyasoft.filters.SecurityFilter</filter-class>
+   
+   <init-param>
+      <param-name>test-param</param-name>
+      <param-value>Initialization Paramter</param-value>
+   </init-param>
+</filter>
+
+<filter-mapping>
+   <filter-name>SecurityFilter</filter-name>
+   <url-pattern>*.jsp</url-pattern>
+</filter-mapping>
+   
+<servlet>
+    <servlet-name>LoadOnStart</servlet-name>
+    <servlet-class>com.triyasoft.servlet.LoadOnStartServlet</servlet-class>
+    <load-on-startup>0</load-on-startup>
+</servlet> 
+   
+   
+	 <filter>
+  <filter-name>CorsFilter</filter-name>
+  <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>CorsFilter</filter-name>
+  <url-pattern>/getphoneNumber/*,/getphoneNumberOnClick/*</url-pattern>
+</filter-mapping>
+  
+  <!--  
+  <welcome-file-list>
+    <welcome-file>login.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <listener>
+    <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+</listener>
+
+
+<filter>
+    <filter-name>ShiroFilter</filter-name>
+    <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+</filter>
+
+<filter-mapping>
+    <filter-name>ShiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>ERROR</dispatcher>
+</filter-mapping>
+
+-->
+  
+</web-app>

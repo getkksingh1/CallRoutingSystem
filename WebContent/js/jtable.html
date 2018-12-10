@@ -1,0 +1,247 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+                    <script src="http://www.jtable.org/Scripts/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="http://www.jtable.org/Scripts/jquery-ui-1.10.0.min.js" type="text/javascript"></script>
+    themes/metro/darkgray/jtable.css" rel="stylesheet" type="text/css" />
+            <link href="http://www.jtable.org/Scripts/jtable/themes/metro/blue/jtable.css" rel="stylesheet" type="text/css" />
+        <link href="http://www.jtable.org/Content/themes/metroblue/jquery-ui.css" rel="stylesheet" type="text/css" />
+        <link href="http://www.jtable.org/Scripts/jtable/themes/metro/blue/jtable.css" rel="stylesheet" type="text/css" />
+<style>
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #7f2021;
+}
+
+li {
+    float: left;
+}
+
+li a, .dropbtn {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover, .dropdown:hover .dropbtn {
+    background-color: green;
+}
+
+li.dropdown {
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>
+
+        <script src="jquery.jtable.min.js" type="text/javascript"></script>
+
+        
+
+    </head>
+    <body>
+    
+    <ul>
+  <li><a href="#home">Dashboard</a></li>
+  
+    <li><a href="#home">Calls</a></li>
+
+
+<li class="dropdown">
+    <a href="javascript:void(0)" class="dropbtn">Traffic Sources</a>
+    <div class="dropdown-content">
+      <a href="#">Traffic Sources</a>
+      <a href="#">New Traffic Source</a>
+    </div>
+  </li>
+
+  <li class="dropdown">
+    <a href="javascript:void(0)" class="dropbtn">Buyers</a>
+    <div class="dropdown-content">
+      <a href="#">Buyers</a>
+      <a href="#">New Buyer</a>
+    </div>
+  </li>
+  
+  
+  <li class="dropdown">
+    <a href="javascript:void(0)" class="dropbtn">Numbers</a>
+    <div class="dropdown-content">
+      <a href="#">Numbers</a>
+      <a href="#">New Number</a>
+    </div>
+  </li>
+
+    <li><a href="#home">Reports</a></li>
+
+
+   <li style="float:right"><a class="active" href="#about">Hiteshwar Jindal</a></li>
+
+  
+</ul>
+    
+
+    <div id="StudentTableContainer">
+</div>
+<script type="text/javascript">
+
+    var cachedCityOptions = null;
+
+    $(document).ready(function () {
+
+        $('#StudentTableContainer').jtable({
+            title: 'Buyers List',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            multiSorting: true,
+            defaultSorting: 'Name ASC',
+            actions: {
+                listAction: function (postData, jtParams) {
+                    console.log("Loading from custom function...");
+                    return $.Deferred(function ($dfd) {
+                        $.ajax({
+                            url: 'StudentList?jtStartIndex=' + jtParams.jtStartIndex + '&jtPageSize=' + jtParams.jtPageSize + '&jtSorting=' + jtParams.jtSorting,
+                            type: 'POST',
+                            dataType: 'json',
+                            data: postData,
+                            success: function (data) {
+                                $dfd.resolve(data);
+                            },
+                            error: function () {
+                                $dfd.reject();
+                            }
+                        });
+                    });
+                },
+                deleteAction: function (postData) {
+                    console.log("deleting from custom function...");
+                    return $.Deferred(function ($dfd) {
+                        $.ajax({
+                            url: '/Demo/DeleteStudent',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: postData,
+                            success: function (data) {
+                                $dfd.resolve(data);
+                            },
+                            error: function () {
+                                $dfd.reject();
+                            }
+                        });
+                    });
+                },
+                createAction: function (postData) {
+                    console.log("creating from custom function...");
+                    return $.Deferred(function ($dfd) {
+                        $.ajax({
+                            url: '/Demo/CreateStudent',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: postData,
+                            success: function (data) {
+                                $dfd.resolve(data);
+                            },
+                            error: function () {
+                                $dfd.reject();
+                            }
+                        });
+                    });
+                },
+                updateAction: function (postData) {
+                    console.log("updating from custom function...");
+                    return $.Deferred(function ($dfd) {
+                        $.ajax({
+                            url: '/Demo/UpdateStudent',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: postData,
+                            success: function (data) {
+                                $dfd.resolve(data);
+                            },
+                            error: function () {
+                                $dfd.reject();
+                            }
+                        });
+                    });
+                }
+            },
+            fields: {
+                buyer_id: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                buyer_name: {
+                    title: 'Buyer Name',
+                    width: '23%'
+                },
+                buyer_number: {
+                    title: 'Buyer Number',
+                },
+                weight: {
+                    title: 'Weight',
+
+                },
+                tier: {
+                    title: 'Tier',
+                    width: '13%',
+                },
+                concurrency_cap_limit: {
+                    title: 'Concurrency Cap',
+                    width: '15%',
+                },
+                bid_price: {
+                    title: 'Bid Price',
+                },
+                
+                is_active: {
+                    title: 'Status',
+                    width: '12%',
+                    type: 'checkbox',
+                    values: { '0': 'Inactive', '1': 'Active' },
+                    defaultValue: 'true'
+                }
+                
+            }
+        });
+
+        //Load student list from server
+        $('#StudentTableContainer').jtable('load');
+    });
+
+</script>
+
+    
+</body>
+</html>
+
+
+
